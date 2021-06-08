@@ -22,7 +22,7 @@
 
     - name: Install pip
       apt:
-        name: ['python-pip=9.0.1-2.3~ubuntu1.18.04.4']
+        name: ['python-pip=9.0.1-2.3~ubuntu1.18.04.5']
         state: present
         update_cache: yes
       become: yes
