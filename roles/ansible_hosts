@@ -1,13 +1,11 @@
 
 [ansible_servers]
-nginx ansible_host=172.31.29.250
-web_app ansible_host=172.31.31.172
-postgresql ansible_host=172.31.23.12
+nginx ansible_host=127.0.0.1
+web_app ansible_host=127.0.0.2
+postgresql ansible_host=127.0.0.3
 
 [all:vars]
 ansible_python_interpreter=/usr/bin/python2.7
-nginx_fqdn=ec2-52-14-146-67.us-east-2.compute.amazonaws.com
-postgresql_host=172.31.23.12
-web_app_host=172.31.31.172
+nginx_fqdn=ec2-18-116-33-240.us-east-2.compute.amazonaws.com
 DATA=/data
 path2cert=/etc/nginx/certs
