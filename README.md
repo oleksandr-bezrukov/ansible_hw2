@@ -1,8 +1,8 @@
 ## MODULE 6 - Ansible
 ## Homework 2
 =====================
-##Preparing playbooks as on the First level, but using roles
-##On both levels, SSL terminating on the load balancer (self-signed or from Let's Encrypt) as a huge plus. 
+## Preparing playbooks as on the First level, but using roles
+## On both levels, SSL terminating on the load balancer (self-signed or from Let's Encrypt) as a huge plus. 
 =====================
 
  ###  Task's environment:
