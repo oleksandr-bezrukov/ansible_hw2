@@ -1,0 +1,191 @@
+[
+    {
+        "id": "e79b7a49.7a39b8",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "a3a2bf71.3ebf6",
+        "type": "http in",
+        "z": "e79b7a49.7a39b8",
+        "name": "",
+        "url": "/query",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 80,
+        "y": 20,
+        "wires": [
+            [
+                "a41fd4f8.bd3388",
+                "c68d5a56.5100a8"
+            ]
+        ]
+    },
+    {
+        "id": "a41fd4f8.bd3388",
+        "type": "debug",
+        "z": "e79b7a49.7a39b8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 350,
+        "y": 20,
+        "wires": []
+    },
+    {
+        "id": "93d0a486.910718",
+        "type": "inject",
+        "z": "e79b7a49.7a39b8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 60,
+        "wires": [
+            [
+                "c68d5a56.5100a8"
+            ]
+        ]
+    },
+    {
+        "id": "c68d5a56.5100a8",
+        "type": "function",
+        "z": "e79b7a49.7a39b8",
+        "name": "",
+        "func": "msg.payload = `select version() as version, current_timestamp as timestamp;` \nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 60,
+        "wires": [
+            [
+                "cca1c6a3.abdee8"
+            ]
+        ]
+    },
+    {
+        "id": "b0ea33c.4caf6d",
+        "type": "debug",
+        "z": "e79b7a49.7a39b8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 630,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "cca1c6a3.abdee8",
+        "type": "postgres",
+        "z": "e79b7a49.7a39b8",
+        "postgresdb": "b36084c7.c00f48",
+        "name": "",
+        "output": true,
+        "perrow": false,
+        "rowspermsg": "1",
+        "return_on_error": true,
+        "limit_queries": "0",
+        "limit_by": "payload",
+        "limit_value": "1",
+        "limit_drop_intermediate": false,
+        "limit_drop_if_in_queue": false,
+        "outputs": true,
+        "x": 480,
+        "y": 60,
+        "wires": [
+            [
+                "b0ea33c.4caf6d",
+                "3b89ef0c.c345"
+            ]
+        ]
+    },
+    {
+        "id": "5e5b1c9c.c02184",
+        "type": "debug",
+        "z": "e79b7a49.7a39b8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 510,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "3b89ef0c.c345",
+        "type": "function",
+        "z": "e79b7a49.7a39b8",
+        "name": "",
+        "func": "let dbAnswer = msg.payload[0];\nmsg.payload = \n`<!DOCTYPE html>\n  <html lang=\"en\">\n  <head>\n     <meta charset=\"utf-8\">\n     <title>Query</title>  \n  </head>\n  <body>\n     <h1>Timestamp: ${msg.payload[0].timestamp}</h1>\n     <p>\n     <h2>Postgres version: ${msg.payload[0].version}</h2>\n\n    \n  </body>\n </html>`\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 140,
+        "wires": [
+            [
+                "5e5b1c9c.c02184",
+                "d6e96835.8975e8"
+            ]
+        ]
+    },
+    {
+        "id": "d6e96835.8975e8",
+        "type": "http response",
+        "z": "e79b7a49.7a39b8",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 510,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "b36084c7.c00f48",
+        "type": "postgresdb",
+        "cfgname": "pg",
+        "hostname": "{{postgresql_host}}",
+        "port": "8080",
+        "db": "postgres",
+        "ssl": false
+    }
+]

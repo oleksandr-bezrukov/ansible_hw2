@@ -1,0 +1,54 @@
+---
+    - name: Install Nginx
+      apt:
+        name: ['nginx=1.14.0-0ubuntu1.9']
+        state: present
+        update_cache: yes
+      become: yes
+
+#    - name: Show facts available on the system
+#      ansible.builtin.debug:
+#         var: ansible_facts.packages
+
+    - name: Add NGINX config 1
+      copy: src=nginx.conf dest=/etc/nginx/ #owner=nginx group=nginx
+      become: yes
+
+    - name: Add NGINX config 2
+      template: src=fwd.conf dest=/etc/nginx/conf.d/ #owner=nginx group=nginx
+      become: yes
+
+    - name: Create a directory for certificates if it does not exist
+      file:
+        path: "{{path2cert}}"
+        state: directory
+        mode: '0755'
+      become: yes
+
+    - name: check if certificate exists
+      stat:
+        path: "{{path2cert}}/certificate.pem"
+      register: nginx_cert
+
+    - name: create nginx cert if not exists
+      shell: "openssl req -x509 -newkey rsa:2048 -nodes -keyout {{path2cert}}/privkey.pem  -days 36500 -out {{path2cert}}/certificate.pem -subj '/C=US/ST=NRW/L=Earth/O=CompanyName/OU=IT/CN={{nginx_fqdn}}/emailAddress=email@example.com'"
+      when: not nginx_cert.stat.exists
+      become: yes
+
+    - name: Check NGINX configs
+      shell: "/usr/sbin/nginx -t"
+      register: nginx_config_status
+      become: yes
+
+#    - name: NGINX test status
+#      debug:
+#        msg: "{{ nginx_config_status.rc }}"
+
+    - name: Service NGINX restart and enable on boot
+      systemd:
+        name: nginx
+        state: restarted
+        enabled: yes
+        daemon_reload: yes
+      when: nginx_config_status.rc == 0
+      become: yes

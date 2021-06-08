@@ -1,0 +1,112 @@
+---
+    - name: Install postgres
+      apt:
+        name: ['postgresql=10+190ubuntu0.1']
+        state: present
+        update_cache: yes
+      become: yes
+
+    - name: Install postgresql-contrib
+      apt:
+        name: ['postgresql-contrib=10+190ubuntu0.1']
+        state: present
+        update_cache: yes
+      become: yes
+
+    - name: Install postgresql-server-dev-10
+      apt:
+        name: ['postgresql-server-dev-10=10.17-0ubuntu0.18.04.1']
+        state: present
+        update_cache: yes
+      become: yes
+
+    - name: Install pip
+      apt:
+        name: ['python-pip=9.0.1-2.3~ubuntu1.18.04.4']
+        state: present
+        update_cache: yes
+      become: yes
+
+    - name: Install postgresql-contrib
+      pip:
+        name: psycopg2==2.8.6
+      become: yes
+
+    - name: Create a directory for database
+      file:
+        path: "{{DATA}}"
+        state: directory
+        mode: '0700'
+        owner: postgres
+        group: postgres
+      become: yes
+
+    - name: Check if db exists
+      stat:
+        path: "{{DATA}}/PG_VERSION"
+      register: db_exists
+      become: yes
+
+#    - name: show answer if exists
+#      debug:
+#        msg: "{{ db_exists.stat.exists }}"
+
+    - name: create db if not exists
+      shell: "/usr/lib/postgresql/10/bin/initdb -D {{DATA}}"
+      when: not db_exists.stat.exists
+      become: yes
+      become_user: postgres
+
+    - name: copy postgresql config file
+      copy:
+        src: postgresql.conf
+        dest: "{{DATA}}/postgresql.conf"
+      become: yes
+      become_user: postgres
+      when: not db_exists.stat.exists
+
+    - name: copy postgresql config file
+      copy:
+        src: pg_hba.conf
+        dest: "{{DATA}}/pg_hba.conf"
+      become: yes
+      become_user: postgres
+      when: not db_exists.stat.exists
+
+    - name: start db
+      shell: "/usr/lib/postgresql/10/bin/pg_ctl -D {{DATA}} -l {{DATA}}/logfile start"
+      when: not db_exists.stat.exists
+      become: yes
+      become_user: postgres
+
+    - name: restart db
+      shell: "/usr/lib/postgresql/10/bin/pg_ctl -D {{DATA}} -l {{DATA}}/logfile restart"
+      become: yes
+      become_user: postgres
+      when: db_exists.stat.exists
+
+    - name: check db connection
+      shell: "pg_isready -p 8080"
+      become: yes
+      become_user: postgres
+      register: db_ready
+
+#    - name: show answer.
+#      debug:
+#        msg: "{{ db_ready }}"
+
+    - name: load pg password
+      include_vars:
+        file: encrypted_pg_password.yml
+
+    - name: create postgres user
+      become: yes
+      become_user: postgres
+      postgresql_user:
+#          db: postgres
+          name: puser
+          password: "{{encrypted_pg_password}}"
+          role_attr_flags: CREATEDB,SUPERUSER,CREATEROLE,INHERIT,LOGIN
+          port: 8080
+      when: db_ready.rc == 0
+

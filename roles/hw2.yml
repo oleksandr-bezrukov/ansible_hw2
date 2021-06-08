@@ -1,0 +1,13 @@
+---
+- hosts: postgresql
+  become: yes
+  roles:
+    - db
+- hosts: web_app
+  become: yes
+  roles:
+    - web_app
+- hosts: nginx
+  become: yes
+  roles:
+    - nginx
