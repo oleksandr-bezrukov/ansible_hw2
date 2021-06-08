@@ -9,3 +9,4 @@ ansible_python_interpreter=/usr/bin/python2.7
 nginx_fqdn=ec2-18-116-33-240.us-east-2.compute.amazonaws.com
 DATA=/data
 path2cert=/etc/nginx/certs
+net_mask=172.31.0.0/16
