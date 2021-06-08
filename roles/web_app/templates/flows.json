@@ -183,7 +183,7 @@
         "id": "b36084c7.c00f48",
         "type": "postgresdb",
         "cfgname": "pg",
-        "hostname": "{{postgresql_host}}",
+        "hostname": "{{hostvars.postgresql.ansible_host}}",
         "port": "8080",
         "db": "postgres",
         "ssl": false
