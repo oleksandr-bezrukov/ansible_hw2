@@ -65,15 +65,34 @@
       shell: "psql \"postgresql://puser:{{encrypted_pg_password}}@{{hostvars.postgresql.ansible_host}}:8080/postgres\" -q -c \"\\l\""
       register: postgresql_connection
       become: yes
+      
+    - name: Check if pm2 already has been started
+      shell: "pm2 ping"
+      register: pm2_started
+      become: yes
+      become_user: node-red
+
+    - name: Check postgresql connection
+      shell: "psql \"postgresql://puser:{{encrypted_pg_password}}@{{hostvars.postgresql.ansible_host}}:8080/postgres\" -q -c \"\\l\""
+      register: postgresql_connection
+      become: yes
 
     - name: init run
-      shell: "pm2 start node-red -- --userDir {{DATA}} --port 8080"
-      when: not not_init_run.stat.exists 
+      shell: " pm2 delete all || : && pm2 start node-red -- --userDir /data --port 8080"
+#      shell: "pm2 start node-red -- --userDir {{DATA}} --port 8080"
+#      when: not not_init_run.stat.exists 
+      when: postgresql_connection.rc == 0
       become: yes
       become_user: node-red
 
-    - name: rerun web application if not init run
-      shell: "pm2 restart node-red -- --userDir {{DATA}} --port 8080"
-      when: not_init_run.stat.exists 
-      become: yes
-      become_user: node-red
+#    - name: init run
+#      shell: "pm2 start node-red -- --userDir {{DATA}} --port 8080"
+#     when: pm2_started.rc == 0
+#      become: yes
+#      become_user: node-red
+
+#    - name: rerun web application if not init run
+#      shell: "pm2 restart node-red -- --userDir {{DATA}} --port 8080"
+#      when: not_init_run.stat.exists 
+#      become: yes
+#      become_user: node-red
