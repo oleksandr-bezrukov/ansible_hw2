@@ -59,7 +59,7 @@
       
     - name: load pg password
       include_vars:
-        file: ../db/encrypted_pg_password.yml
+        file: ../db/vars/encrypted_pg_password.yml
       
     - name: Check postgresql connection
       shell: "psql \"postgresql://puser:{{encrypted_pg_password}}@{{hostvars.postgresql.ansible_host}}:8080/postgres\" -q -c \"\\l\""
